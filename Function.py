@@ -61,7 +61,7 @@ def get_question_data(file_path: str, sub_lesson: str, template: str = None) -> 
                 break
 
         if start_idx is None:
-            return {"error": f"Template '{template}' not found for this sub-lesson."}
+            return {"error": f"Template '{template}' No Sample Question found for this Template."}
 
         # Find where the next template block starts (using known headers)
         for j in range(start_idx + 1, len(lines)):

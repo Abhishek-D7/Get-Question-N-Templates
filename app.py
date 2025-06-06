@@ -85,7 +85,7 @@ def get_question_template(query: QueryRequest):
     question_text = revised if pd.notna(revised) and revised.strip() else sample
     template_list = row.get('Templates', '')
 
-    if query.template:
+    if query.template and query.template.strip():
         # Case 2: Sub-lesson + Template
         specific_question = extract_block_by_template(question_text, query.template)
         if specific_question:
@@ -95,7 +95,8 @@ def get_question_template(query: QueryRequest):
                 "Question": specific_question
             }
         else:
-            raise HTTPException(status_code=404, detail=f"Template '{query.template}' No Sample Question found for this Template.")
+            raise HTTPException(status_code=404,
+                                detail=f"Template '{query.template}' No Sample Question found for this Template.")
     else:
         # Case 1: Only Sub-lesson
         return {

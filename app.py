@@ -28,13 +28,31 @@ class QueryRequest(BaseModel):
 
 # Extract block by template name
 def extract_block_by_template(text: str, template: str) -> str:
-    if not isinstance(text, str):
+    if not isinstance(text, str) or not template:
         return ""
+
     lines = text.splitlines()
     start_idx = None
     end_idx = len(lines)
 
-    # Find where the block starts
+    # Template headings to detect block boundaries
+    templates = [
+        "Interactive Matching",
+        "True / False",
+        "MCQ with",
+        "Drag and Drop",
+        "Sorting",
+        "Interactive matching",
+        "MCQ options with Images ",
+        "Audio Options plus Images",
+        "MCQ with two options",
+        "Multiple Choice with Passage"
+    ]
+
+    # Compile pattern to detect template headings in the text
+    pattern = r"^\s*(" + "|".join(re.escape(t) for t in templates) + r")"
+
+    # Find the block start by partial match of the template
     for i, line in enumerate(lines):
         if template.lower() in line.strip().lower():
             start_idx = i
@@ -43,13 +61,14 @@ def extract_block_by_template(text: str, template: str) -> str:
     if start_idx is None:
         return ""
 
-    # Find where the next block starts (match known templates)
+    # Find where the next known template block starts
     for j in range(start_idx + 1, len(lines)):
-        if re.match(r"^(Interactive Matching|True / False|MCQ with|Drag and Drop|Sorting|Interactive matching)", lines[j], re.IGNORECASE):
+        if re.match(pattern, lines[j], re.IGNORECASE):
             end_idx = j
             break
 
     return "\n".join(lines[start_idx:end_idx]).strip()
+
 
 
 # Main route
@@ -76,7 +95,7 @@ def get_question_template(query: QueryRequest):
                 "Question": specific_question
             }
         else:
-            raise HTTPException(status_code=404, detail=f"Template '{query.template}' not found for this sub-lesson.")
+            raise HTTPException(status_code=404, detail=f"Template '{query.template}' No Sample Question found for this Template.")
     else:
         # Case 1: Only Sub-lesson
         return {

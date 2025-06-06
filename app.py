@@ -8,6 +8,9 @@ app = FastAPI()
 # File Path (CSV or Excel in same folder)
 file_path = "Untitled tryspreadsheet - Sheet1.csv"
 
+# Replace with your actual Google Sheet CSV URL and Sheet ID
+# sheet_url = "https://docs.google.com/spreadsheets/d/<Sheet-ID>/export?format=csv"
+
 #  Load file once when app starts
 if file_path.endswith(".csv"):
     df = pd.read_csv(file_path)
